@@ -1,0 +1,12 @@
+{
+  "name": "portfolio-milan-boskamp",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Vanilla portfolio met Supabase CMS en verborgen admin",
+  "scripts": {
+    "build": "node scripts/generate-config.js",
+    "config:local": "node scripts/generate-config.js --local",
+    "db:push": "bash scripts/push-migrations.sh",
+    "db:seed": "bash scripts/seed-dev.sh"
+  }
+}

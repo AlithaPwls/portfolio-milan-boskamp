@@ -1,0 +1,12 @@
+# Supabase config met echte keys (lokaal gegenereerd)
+lib/config.js
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Lokale env voor config-generatie
+.env
+.env.local

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Portfolio — Milan Boskamp, student bouwkundig tekenen" />
+  <title>Milan Boskamp — Bouwkundig tekenen</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Naar inhoud</a>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="#" class="logo" id="site-logo">Portfolio</a>
+      <nav class="nav" aria-label="Hoofdnavigatie">
+        <a href="#about">Over mij</a>
+        <a href="#projects">Projecten</a>
+        <a href="#skills">Skills</a>
+        <a href="#experience">Ervaring</a>
+        <a href="#education">Opleiding</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <button type="button" class="nav-toggle" id="nav-toggle" aria-label="Menu openen" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <section id="hero" class="hero section">
+      <div class="container hero-grid">
+        <div class="hero-content">
+          <p class="eyebrow" id="hero-eyebrow">Welkom</p>
+          <h1 id="hero-title">Portfolio</h1>
+          <p class="hero-subtitle" id="hero-subtitle">Student bouwkundig tekenen</p>
+          <a href="#contact" class="btn btn-primary" id="hero-cta">Neem contact op</a>
+        </div>
+        <div class="hero-image-wrap">
+          <img id="hero-profile" src="" alt="" class="hero-image" hidden />
+          <div id="hero-profile-placeholder" class="hero-image-placeholder" aria-hidden="true"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" class="section">
+      <div class="container">
+        <h2 class="section-title">Over mij</h2>
+        <p id="about-text" class="about-text">Content wordt geladen…</p>
+      </div>
+    </section>
+
+    <section id="projects" class="section section-alt">
+      <div class="container">
+        <h2 class="section-title">Projecten &amp; tekeningen</h2>
+        <div id="projects-grid" class="cards-grid" role="list"></div>
+        <p id="projects-empty" class="empty-state" hidden>Nog geen projecten.</p>
+      </div>
+    </section>
+
+    <section id="skills" class="section">
+      <div class="container">
+        <h2 class="section-title">Skills</h2>
+        <div id="skills-container" class="skills-container"></div>
+        <p id="skills-empty" class="empty-state" hidden>Nog geen skills toegevoegd.</p>
+      </div>
+    </section>
+
+    <section id="experience" class="section section-alt">
+      <div class="container">
+        <h2 class="section-title">Ervaring</h2>
+        <div id="experience-list" class="timeline"></div>
+        <p id="experience-empty" class="empty-state" hidden>Nog geen ervaring toegevoegd.</p>
+      </div>
+    </section>
+
+    <section id="education" class="section">
+      <div class="container">
+        <h2 class="section-title">Opleiding</h2>
+        <div id="education-list" class="timeline"></div>
+        <p id="education-empty" class="empty-state" hidden>Nog geen opleidingen toegevoegd.</p>
+      </div>
+    </section>
+
+    <section id="contact" class="section section-alt">
+      <div class="container contact-block">
+        <h2 class="section-title">Contact</h2>
+        <p class="contact-intro">Interesse in samenwerking? Neem gerust contact op.</p>
+        <a id="contact-email" class="contact-email" href="#">email@voorbeeld.nl</a>
+        <div id="social-links" class="social-links"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p id="footer-text">&copy; <span id="footer-year"></span> Portfolio</p>
+    </div>
+  </footer>
+
+  <div id="load-error" class="load-error" role="alert" hidden>
+    Kon content niet laden. Probeer de pagina te vernieuwen.
+  </div>
+
+  <script src="lib/config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="lib/supabase.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

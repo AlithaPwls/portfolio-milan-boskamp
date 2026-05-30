@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/admin/admin.css" />
+</head>
+<body class="admin-dashboard">
+  <div id="auth-loading" class="auth-loading">Sessie controleren…</div>
+
+  <div id="dashboard-app" class="dashboard-app" hidden>
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h1>Beheer</h1>
+        <a href="/" target="_blank" rel="noopener">Site bekijken ↗</a>
+      </div>
+      <nav class="sidebar-nav" aria-label="Admin secties">
+        <button type="button" class="nav-item is-active" data-panel="general">Algemeen</button>
+        <button type="button" class="nav-item" data-panel="profile">Profielfoto</button>
+        <button type="button" class="nav-item" data-panel="theme">Thema</button>
+        <button type="button" class="nav-item" data-panel="projects">Projecten</button>
+        <button type="button" class="nav-item" data-panel="skills">Skills</button>
+        <button type="button" class="nav-item" data-panel="experiences">Ervaring</button>
+        <button type="button" class="nav-item" data-panel="educations">Opleiding</button>
+        <button type="button" class="nav-item" data-panel="contact">Contact &amp; social</button>
+      </nav>
+      <button type="button" class="btn btn-outline logout-btn" id="logout-btn">Uitloggen</button>
+    </aside>
+
+    <main class="dashboard-main">
+      <div id="status-message" class="message" role="status" hidden></div>
+
+      <!-- Algemeen -->
+      <section class="panel is-active" id="panel-general" data-panel="general">
+        <h2>Algemene teksten</h2>
+        <form id="form-general" class="admin-form">
+          <label>Naam (logo / footer)
+            <input type="text" name="owner_name" />
+          </label>
+          <label>Hero titel
+            <input type="text" name="hero_title" />
+          </label>
+          <label>Hero ondertitel
+            <input type="text" name="hero_subtitle" />
+          </label>
+          <label>Over mij
+            <textarea name="about_text" rows="6"></textarea>
+          </label>
+          <button type="submit" class="btn btn-primary">Opslaan</button>
+        </form>
+      </section>
+
+      <!-- Profiel -->
+      <section class="panel" id="panel-profile" data-panel="profile">
+        <h2>Profielfoto</h2>
+        <img id="profile-preview" class="preview-image" alt="Huidige profielfoto" hidden />
+        <form id="form-profile" class="admin-form">
+          <label>Nieuwe foto uploaden
+            <input type="file" name="file" accept="image/jpeg,image/png,image/webp,image/gif" />
+          </label>
+          <button type="submit" class="btn btn-primary">Uploaden en opslaan</button>
+        </form>
+      </section>
+
+      <!-- Thema -->
+      <section class="panel" id="panel-theme" data-panel="theme">
+        <h2>Thema &amp; kleuren</h2>
+        <form id="form-theme" class="admin-form form-grid">
+          <label>Primaire kleur
+            <input type="color" name="primary_color" />
+          </label>
+          <label>Achtergrondkleur
+            <input type="color" name="background_color" />
+          </label>
+          <label>Tekstkleur
+            <input type="color" name="text_color" />
+          </label>
+          <label>Lettertype
+            <select name="font_family">
+              <option value="Inter, system-ui, sans-serif">Inter</option>
+              <option value="'DM Sans', system-ui, sans-serif">DM Sans</option>
+              <option value="'Source Sans 3', system-ui, sans-serif">Source Sans 3</option>
+              <option value="'Playfair Display', Georgia, serif">Playfair Display</option>
+              <option value="system-ui, sans-serif">Systeem</option>
+            </select>
+          </label>
+          <label>Button radius (bijv. 8px of 999px)
+            <input type="text" name="button_radius" placeholder="8px" />
+          </label>
+          <button type="submit" class="btn btn-primary">Thema opslaan</button>
+        </form>
+      </section>
+
+      <!-- Projecten -->
+      <section class="panel" id="panel-projects" data-panel="projects">
+        <h2>Projecten</h2>
+        <div id="list-projects" class="item-list"></div>
+        <h3 id="projects-form-title">Nieuw project</h3>
+        <form id="form-projects" class="admin-form">
+          <input type="hidden" name="id" />
+          <label>Titel <input type="text" name="title" required /></label>
+          <label>Beschrijving <textarea name="description" rows="3"></textarea></label>
+          <label>Afbeelding URL <input type="url" name="image_url" placeholder="Of upload hieronder" /></label>
+          <label>Afbeelding uploaden <input type="file" name="image_file" accept="image/*" /></label>
+          <label>Link (PDF, Drive, etc.) <input type="url" name="live_url" placeholder="Optioneel" /></label>
+          <label>Sorteervolgorde <input type="number" name="sort_order" value="0" />
+            <span class="hint">Lager = eerder in de lijst</span>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" name="is_featured" /> Uitgelicht project
+          </label>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Opslaan</button>
+            <button type="button" class="btn btn-outline" id="projects-cancel" hidden>Annuleren</button>
+            <button type="button" class="btn btn-danger" id="projects-delete" hidden>Verwijderen</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Skills -->
+      <section class="panel" id="panel-skills" data-panel="skills">
+        <h2>Skills</h2>
+        <div id="list-skills" class="item-list"></div>
+        <h3 id="skills-form-title">Nieuwe skill</h3>
+        <form id="form-skills" class="admin-form">
+          <input type="hidden" name="id" />
+          <label>Naam <input type="text" name="name" required /></label>
+          <label>Categorie <input type="text" name="category" placeholder="bijv. Frontend" /></label>
+          <label>Sorteervolgorde <input type="number" name="sort_order" value="0" /></label>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Opslaan</button>
+            <button type="button" class="btn btn-outline" id="skills-cancel" hidden>Annuleren</button>
+            <button type="button" class="btn btn-danger" id="skills-delete" hidden>Verwijderen</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Ervaring -->
+      <section class="panel" id="panel-experiences" data-panel="experiences">
+        <h2>Ervaring</h2>
+        <div id="list-experiences" class="item-list"></div>
+        <h3 id="experiences-form-title">Nieuwe ervaring</h3>
+        <form id="form-experiences" class="admin-form">
+          <input type="hidden" name="id" />
+          <label>Functie / titel <input type="text" name="title" required /></label>
+          <label>Bedrijf <input type="text" name="company" /></label>
+          <label>Start <input type="text" name="start_date" placeholder="bijv. 2020" /></label>
+          <label>Einde <input type="text" name="end_date" placeholder="bijv. 2024 of Heden" /></label>
+          <label>Beschrijving <textarea name="description" rows="3"></textarea></label>
+          <label>Sorteervolgorde <input type="number" name="sort_order" value="0" /></label>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Opslaan</button>
+            <button type="button" class="btn btn-outline" id="experiences-cancel" hidden>Annuleren</button>
+            <button type="button" class="btn btn-danger" id="experiences-delete" hidden>Verwijderen</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Opleiding -->
+      <section class="panel" id="panel-educations" data-panel="educations">
+        <h2>Opleiding</h2>
+        <div id="list-educations" class="item-list"></div>
+        <h3 id="educations-form-title">Nieuwe opleiding</h3>
+        <form id="form-educations" class="admin-form">
+          <input type="hidden" name="id" />
+          <label>Opleiding <input type="text" name="title" required /></label>
+          <label>School <input type="text" name="school" /></label>
+          <label>Start <input type="text" name="start_date" /></label>
+          <label>Einde <input type="text" name="end_date" /></label>
+          <label>Beschrijving <textarea name="description" rows="3"></textarea></label>
+          <label>Sorteervolgorde <input type="number" name="sort_order" value="0" /></label>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Opslaan</button>
+            <button type="button" class="btn btn-outline" id="educations-cancel" hidden>Annuleren</button>
+            <button type="button" class="btn btn-danger" id="educations-delete" hidden>Verwijderen</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Contact -->
+      <section class="panel" id="panel-contact" data-panel="contact">
+        <h2>Contact &amp; social</h2>
+        <form id="form-contact" class="admin-form">
+          <label>E-mail <input type="email" name="contact_email" /></label>
+          <label>LinkedIn URL <input type="url" name="linkedin_url" /></label>
+          <label>Instagram URL <input type="url" name="instagram_url" /></label>
+          <button type="submit" class="btn btn-primary">Opslaan</button>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <script src="/lib/config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="/lib/supabase.js"></script>
+  <script src="/admin/admin-dashboard.js"></script>
+</body>
+</html>
