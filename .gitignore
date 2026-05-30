@@ -1,6 +1,9 @@
 # Supabase config met echte keys (lokaal gegenereerd)
 lib/config.js
 
+# Database-export (lokaal dev → prod)
+supabase/exported-from-dev.sql
+
 # OS / editor
 .DS_Store
 Thumbs.db

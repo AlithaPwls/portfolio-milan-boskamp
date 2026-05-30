@@ -60,14 +60,6 @@ body {
 }
 
 /* Dashboard layout */
-.auth-loading {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #64748b;
-}
-
 .dashboard-app {
   display: grid;
   grid-template-columns: 240px 1fr;

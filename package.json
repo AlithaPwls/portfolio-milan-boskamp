@@ -7,6 +7,9 @@
     "build": "node scripts/generate-config.js",
     "config:local": "node scripts/generate-config.js --local",
     "db:push": "bash scripts/push-migrations.sh",
-    "db:seed": "bash scripts/seed-dev.sh"
+    "db:push:prod": "bash scripts/push-migrations.sh --prod",
+    "db:seed": "bash scripts/seed-dev.sh",
+    "db:export-dev": "bash scripts/export-dev-content.sh",
+    "db:import-prod": "bash scripts/import-to-prod.sh"
   }
 }

@@ -56,14 +56,16 @@
 
   // --- Auth ---
   async function requireAuth() {
+    if (!window.PortfolioDB) {
+      window.location.replace('/admin');
+      return false;
+    }
     try {
       const session = await window.PortfolioDB.getSession();
       if (!session) {
         window.location.replace('/admin');
         return false;
       }
-      $('#auth-loading').hidden = true;
-      $('#dashboard-app').hidden = false;
       return true;
     } catch (e) {
       console.error(e);
