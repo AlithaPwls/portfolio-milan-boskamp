@@ -80,6 +80,7 @@
     }
 
     setDetailImage('#project-image-secondary', '#project-image-secondary-img', project.image2_url, alt);
+    setDetailImage('#project-image-tertiary', '#project-image-tertiary-img', project.image3_url, alt);
 
     $('#project-loading').hidden = true;
     $('#project-error').hidden = true;

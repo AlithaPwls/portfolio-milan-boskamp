@@ -47,7 +47,7 @@
   function fillForm(form, data) {
     $$('input, textarea, select', form).forEach((field) => {
       const name = field.name;
-      if (!name || name === 'file' || name === 'image_file' || name === 'image2_file' || name === 'thumbnail_file' || name === 'hero_image_file') return;
+      if (!name || name === 'file' || name === 'image_file' || name === 'image2_file' || name === 'image3_file' || name === 'thumbnail_file' || name === 'hero_image_file') return;
       if (field.type === 'checkbox') {
         field.checked = !!data[name];
       } else if (field.type === 'color') {
@@ -63,7 +63,7 @@
     const obj = {};
     for (const [k, v] of fd.entries()) {
       if (k === 'id' && !v) continue;
-      if (k === 'image_file' || k === 'image2_file' || k === 'thumbnail_file' || k === 'hero_image_file' || k === 'file') continue;
+      if (k === 'image_file' || k === 'image2_file' || k === 'image3_file' || k === 'thumbnail_file' || k === 'hero_image_file' || k === 'file') continue;
       obj[k] = v;
     }
     const cb = form.querySelector('[name="is_featured"]');
@@ -385,7 +385,8 @@
 
   function updateProjectPreviews(item) {
     setImagePreview('#projects-preview-main', item?.image_url, 'Hoofdafbeelding');
-    setImagePreview('#projects-preview-image2', item?.image2_url, 'Extra afbeelding');
+    setImagePreview('#projects-preview-image2', item?.image2_url, 'Extra afbeelding 2');
+    setImagePreview('#projects-preview-image3', item?.image3_url, 'Extra afbeelding 3');
     setImagePreview('#projects-preview-thumbnail', item?.thumbnail_image_url, 'Thumbnail');
   }
 
@@ -427,6 +428,7 @@
         long_description: raw.long_description || '',
         image_url: raw.image_url || '',
         image2_url: raw.image2_url || '',
+        image3_url: raw.image3_url || '',
         thumbnail_image_url: raw.thumbnail_image_url || '',
         live_url: raw.live_url || '',
         sort_order: parseInt(raw.sort_order, 10) || 0,
@@ -438,6 +440,7 @@
         uploadFields: [
           { input: 'image_file', column: 'image_url', pathSuffix: 'main' },
           { input: 'image2_file', column: 'image2_url', pathSuffix: 'image2' },
+          { input: 'image3_file', column: 'image3_url', pathSuffix: 'image3' },
           { input: 'thumbnail_file', column: 'thumbnail_image_url', pathSuffix: 'thumbnail' },
         ],
         onEditItem: updateProjectPreviews,
