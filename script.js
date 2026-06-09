@@ -195,7 +195,6 @@
     social.innerHTML = '';
     const links = [
       { url: settings?.linkedin_url, label: 'LinkedIn' },
-      { url: settings?.instagram_url, label: 'Instagram' },
     ].filter((l) => l.url);
 
     links.forEach((l) => {
