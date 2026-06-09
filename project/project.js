@@ -46,18 +46,40 @@
     $('#project-error').hidden = false;
   }
 
+  function setDetailImage(figureId, imgId, url, alt) {
+    const figure = $(figureId);
+    const img = $(imgId);
+    if (!url) {
+      figure.hidden = true;
+      img.removeAttribute('src');
+      return;
+    }
+    img.src = url;
+    img.alt = alt;
+    figure.hidden = false;
+  }
+
   function renderProject(project, settings) {
     renderSiteChrome(settings, project.title);
 
-    const mediaRoot = $('#project-media');
-    mediaRoot.className = 'project-detail-media';
-    mediaRoot.innerHTML = window.PortfolioMedia.buildProjectMedia(project);
-    window.PortfolioMedia.initProjectSlideshows(mediaRoot);
+    const alt = project.title || 'Projectafbeelding';
 
     $('#project-title').textContent = project.title || 'Project';
-    $('#project-description').textContent =
-      project.long_description || project.description || '';
     $('#project-badge').hidden = !project.is_featured;
+
+    setDetailImage('#project-image-main', '#project-image-main-img', project.image_url, alt);
+
+    const descriptionEl = $('#project-description');
+    const longDescription = project.long_description || '';
+    if (longDescription) {
+      descriptionEl.textContent = longDescription;
+      descriptionEl.hidden = false;
+    } else {
+      descriptionEl.textContent = '';
+      descriptionEl.hidden = true;
+    }
+
+    setDetailImage('#project-image-secondary', '#project-image-secondary-img', project.image2_url, alt);
 
     $('#project-loading').hidden = true;
     $('#project-error').hidden = true;
