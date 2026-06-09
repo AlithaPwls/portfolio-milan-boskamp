@@ -530,14 +530,16 @@ a.card:focus-visible {
   overflow: hidden;
   box-shadow: var(--shadow-card);
   border: 1px solid var(--color-border);
-  background: var(--color-border);
+  background: var(--color-card);
 }
 
 .project-detail-image {
   display: block;
   width: 100%;
-  aspect-ratio: 16/9;
-  object-fit: cover;
+  height: auto;
+  max-height: 90vh;
+  object-fit: contain;
+  object-position: center;
 }
 
 .project-detail-description {
