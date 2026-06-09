@@ -65,7 +65,6 @@
     const alt = project.title || 'Projectafbeelding';
 
     $('#project-title').textContent = project.title || 'Project';
-    $('#project-badge').hidden = !project.is_featured;
 
     setDetailImage('#project-image-main', '#project-image-main-img', project.image_url, alt);
 
