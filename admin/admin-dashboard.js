@@ -8,16 +8,33 @@
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 
-  function showStatus(msg, type = 'success') {
+  function showStatus(msg, type = 'success', options = {}) {
     const el = $('#status-message');
+    if (!msg) {
+      el.hidden = true;
+      return;
+    }
     el.textContent = msg;
-    el.className = 'message message-' + type;
-    el.hidden = !msg;
-    if (msg) {
-      clearTimeout(showStatus._t);
+    el.className = 'message message-' + type + ' is-toast';
+    el.hidden = false;
+    clearTimeout(showStatus._t);
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    if (type !== 'loading' && !options.persist) {
       showStatus._t = setTimeout(() => {
         el.hidden = true;
-      }, 4000);
+      }, 5000);
+    }
+  }
+
+  function setButtonLoading(button, loading, idleText, loadingText) {
+    if (!button) return;
+    if (loading) {
+      button.dataset.idleText = button.dataset.idleText || button.textContent;
+      button.textContent = loadingText || 'Bezig…';
+      button.disabled = true;
+    } else {
+      button.textContent = idleText || button.dataset.idleText || button.textContent;
+      button.disabled = false;
     }
   }
 
@@ -30,7 +47,7 @@
   function fillForm(form, data) {
     $$('input, textarea, select', form).forEach((field) => {
       const name = field.name;
-      if (!name || name === 'file' || name === 'image_file') return;
+      if (!name || name === 'file' || name === 'image_file' || name === 'image2_file' || name === 'thumbnail_file') return;
       if (field.type === 'checkbox') {
         field.checked = !!data[name];
       } else if (field.type === 'color') {
@@ -46,7 +63,7 @@
     const obj = {};
     for (const [k, v] of fd.entries()) {
       if (k === 'id' && !v) continue;
-      if (k === 'image_file' || k === 'file') continue;
+      if (k === 'image_file' || k === 'image2_file' || k === 'thumbnail_file' || k === 'file') continue;
       obj[k] = v;
     }
     const cb = form.querySelector('[name="is_featured"]');
@@ -74,6 +91,36 @@
     }
   }
 
+  // --- Sidebar ---
+  const SIDEBAR_KEY = 'portfolio-admin-sidebar-collapsed';
+
+  function setSidebarCollapsed(collapsed) {
+    const sidebar = $('#admin-sidebar');
+    const app = $('#dashboard-app');
+    const toggle = $('#sidebar-toggle');
+    if (!sidebar || !app || !toggle) return;
+
+    sidebar.classList.toggle('is-collapsed', collapsed);
+    app.classList.toggle('is-sidebar-collapsed', collapsed);
+    toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    toggle.title = collapsed ? 'Menu uitklappen' : 'Menu inklappen';
+    localStorage.setItem(SIDEBAR_KEY, collapsed ? '1' : '0');
+  }
+
+  function initSidebar() {
+    const toggle = $('#sidebar-toggle');
+    if (!toggle) return;
+
+    const defaultCollapsed = window.matchMedia('(max-width: 900px)').matches;
+    const stored = localStorage.getItem(SIDEBAR_KEY);
+    const collapsed = stored === null ? defaultCollapsed : stored === '1';
+    setSidebarCollapsed(collapsed);
+
+    toggle.addEventListener('click', () => {
+      setSidebarCollapsed(!$('#admin-sidebar').classList.contains('is-collapsed'));
+    });
+  }
+
   // --- Navigation ---
   function initPanels() {
     $$('.nav-item').forEach((btn) => {
@@ -81,6 +128,9 @@
         const panel = btn.dataset.panel;
         $$('.nav-item').forEach((b) => b.classList.toggle('is-active', b === btn));
         $$('.panel').forEach((p) => p.classList.toggle('is-active', p.dataset.panel === panel));
+        if (window.matchMedia('(max-width: 900px)').matches) {
+          setSidebarCollapsed(true);
+        }
       });
     });
   }
@@ -132,13 +182,19 @@
     });
   }
 
-  function setupCrud(table, listId, formId, titleId, cancelId, deleteId, labelFn, mapFormToRow) {
+  function setupCrud(table, listId, formId, titleId, cancelId, deleteId, labelFn, mapFormToRow, options = {}) {
     const form = $(formId);
     const titleEl = $(titleId);
     const cancelBtn = $(cancelId);
     const deleteBtn = $(deleteId);
+    const uploadFields = options.uploadFields || [];
+    const entityLabel = options.entityLabel || 'Item';
+    const storageFolder = options.storageFolder || table;
+    const onEditItem = options.onEditItem;
+    const onResetForm = options.onResetForm;
 
     const newItemTitle = titleEl.textContent;
+    const submitBtn = $('button[type="submit"]', form);
 
     function resetForm() {
       form.reset();
@@ -146,6 +202,7 @@
       titleEl.textContent = newItemTitle;
       cancelBtn.hidden = true;
       deleteBtn.hidden = true;
+      onResetForm?.();
     }
 
     async function refreshList() {
@@ -153,9 +210,11 @@
       renderItemList(listId, items, labelFn, (item) => {
         fillForm(form, item);
         $('input[name="id"]', form).value = item.id;
-        titleEl.textContent = 'Item bewerken';
+        titleEl.textContent = entityLabel + ' bewerken';
         cancelBtn.hidden = false;
         deleteBtn.hidden = false;
+        onEditItem?.(item);
+        form.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
     }
 
@@ -165,8 +224,9 @@
       const id = $('input[name="id"]', form).value;
       if (!id || !confirm('Weet je zeker dat je dit wilt verwijderen?')) return;
       try {
+        showStatus(entityLabel + ' verwijderen…', 'loading');
         await window.PortfolioDB.deleteRow(table, id);
-        showStatus('Verwijderd.');
+        showStatus(entityLabel + ' verwijderd.');
         resetForm();
         await refreshList();
       } catch (e) {
@@ -181,25 +241,31 @@
       delete raw.id;
 
       try {
+        setButtonLoading(submitBtn, true, null, 'Opslaan…');
+        showStatus(entityLabel + ' opslaan…', 'loading');
+
         let row = mapFormToRow(raw, form);
 
-        const fileInput = $('input[name="image_file"]', form);
-        if (fileInput?.files?.[0]) {
-          const url = await window.PortfolioDB.uploadImage(fileInput.files[0], 'projects/' + (id || 'new'));
-          row.image_url = url;
+        for (const field of uploadFields) {
+          const fileInput = $(`input[name="${field.input}"]`, form);
+          if (!fileInput?.files?.[0]) continue;
+          const path = `${storageFolder}/${id || 'new'}/${field.pathSuffix || field.column}`;
+          row[field.column] = await window.PortfolioDB.uploadImage(fileInput.files[0], path);
         }
 
         if (id) {
           await window.PortfolioDB.updateRow(table, id, row);
-          showStatus('Opgeslagen.');
+          showStatus(entityLabel + ' opgeslagen — wijzigingen staan live.');
         } else {
           await window.PortfolioDB.insertRow(table, row);
-          showStatus('Toegevoegd.');
+          showStatus(entityLabel + ' toegevoegd — zichtbaar op de site.');
         }
         resetForm();
         await refreshList();
       } catch (err) {
         showStatus(err.message, 'error');
+      } finally {
+        setButtonLoading(submitBtn, false);
       }
     });
 
@@ -207,65 +273,90 @@
   }
 
   // --- Form handlers ---
-  function initGeneralForm() {
-    $('#form-general').addEventListener('submit', async (e) => {
+  function initSettingsForm(formId, loadingMsg, successMsg) {
+    const form = $(formId);
+    const submitBtn = $('button[type="submit"]', form);
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const data = formToObject(e.target);
       try {
+        setButtonLoading(submitBtn, true, null, 'Opslaan…');
+        showStatus(loadingMsg, 'loading');
         settings = await window.PortfolioDB.updateSiteSettings(data);
-        showStatus('Algemene teksten opgeslagen.');
+        showStatus(successMsg);
       } catch (err) {
         showStatus(err.message, 'error');
+      } finally {
+        setButtonLoading(submitBtn, false);
       }
     });
+  }
+
+  function initGeneralForm() {
+    initSettingsForm(
+      '#form-general',
+      'Algemene teksten opslaan…',
+      'Algemene teksten opgeslagen — zichtbaar op de homepage.'
+    );
   }
 
   function initThemeForm() {
-    $('#form-theme').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const data = formToObject(e.target);
-      try {
-        settings = await window.PortfolioDB.updateSiteSettings(data);
-        showStatus('Thema opgeslagen.');
-      } catch (err) {
-        showStatus(err.message, 'error');
-      }
-    });
+    initSettingsForm('#form-theme', 'Thema opslaan…', 'Thema opgeslagen — kleuren en lettertype zijn bijgewerkt.');
   }
 
   function initContactForm() {
-    $('#form-contact').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const data = formToObject(e.target);
-      try {
-        settings = await window.PortfolioDB.updateSiteSettings(data);
-        showStatus('Contactgegevens opgeslagen.');
-      } catch (err) {
-        showStatus(err.message, 'error');
-      }
-    });
+    initSettingsForm(
+      '#form-contact',
+      'Contactgegevens opslaan…',
+      'Contact & social opgeslagen — links op de site zijn bijgewerkt.'
+    );
   }
 
   function initProfileForm() {
-    $('#form-profile').addEventListener('submit', async (e) => {
+    const form = $('#form-profile');
+    const submitBtn = $('button[type="submit"]', form);
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const file = $('input[name="file"]', e.target).files[0];
       if (!file) {
-        showStatus('Kies eerst een afbeelding.', 'error');
+        showStatus('Kies eerst een afbeelding om te uploaden.', 'error');
         return;
       }
       try {
+        setButtonLoading(submitBtn, true, null, 'Uploaden…');
+        showStatus('Profielfoto uploaden…', 'loading');
         const url = await window.PortfolioDB.uploadImage(file, 'profile');
         settings = await window.PortfolioDB.updateSiteSettings({ profile_image_url: url });
         const preview = $('#profile-preview');
         preview.src = url;
         preview.hidden = false;
         e.target.reset();
-        showStatus('Profielfoto bijgewerkt.');
+        showStatus('Profielfoto opgeslagen — zichtbaar in de hero.');
       } catch (err) {
         showStatus(err.message, 'error');
+      } finally {
+        setButtonLoading(submitBtn, false);
       }
     });
+  }
+
+  function setImagePreview(previewId, url, alt) {
+    const img = $(previewId);
+    if (!img) return;
+    if (url) {
+      img.src = url;
+      img.alt = alt || 'Huidige afbeelding';
+      img.hidden = false;
+    } else {
+      img.removeAttribute('src');
+      img.hidden = true;
+    }
+  }
+
+  function updateProjectPreviews(item) {
+    setImagePreview('#projects-preview-main', item?.image_url, 'Hoofdafbeelding');
+    setImagePreview('#projects-preview-image2', item?.image2_url, 'Extra afbeelding');
+    setImagePreview('#projects-preview-thumbnail', item?.thumbnail_image_url, 'Thumbnail');
   }
 
   function initLogout() {
@@ -282,6 +373,7 @@
     const ok = await requireAuth();
     if (!ok) return;
 
+    initSidebar();
     initPanels();
     initLogout();
     initGeneralForm();
@@ -303,10 +395,23 @@
         title: raw.title,
         description: raw.description || '',
         image_url: raw.image_url || '',
+        image2_url: raw.image2_url || '',
+        thumbnail_image_url: raw.thumbnail_image_url || '',
         live_url: raw.live_url || '',
         sort_order: parseInt(raw.sort_order, 10) || 0,
         is_featured: !!raw.is_featured,
-      })
+      }),
+      {
+        entityLabel: 'Project',
+        storageFolder: 'projects',
+        uploadFields: [
+          { input: 'image_file', column: 'image_url', pathSuffix: 'main' },
+          { input: 'image2_file', column: 'image2_url', pathSuffix: 'image2' },
+          { input: 'thumbnail_file', column: 'thumbnail_image_url', pathSuffix: 'thumbnail' },
+        ],
+        onEditItem: updateProjectPreviews,
+        onResetForm: () => updateProjectPreviews(null),
+      }
     );
 
     const refreshSkills = setupCrud(
@@ -321,7 +426,8 @@
         name: raw.name,
         category: raw.category || 'Algemeen',
         sort_order: parseInt(raw.sort_order, 10) || 0,
-      })
+      }),
+      { entityLabel: 'Skill' }
     );
 
     const refreshExperiences = setupCrud(
@@ -339,7 +445,8 @@
         end_date: raw.end_date || '',
         description: raw.description || '',
         sort_order: parseInt(raw.sort_order, 10) || 0,
-      })
+      }),
+      { entityLabel: 'Ervaring' }
     );
 
     const refreshEducations = setupCrud(
@@ -357,7 +464,8 @@
         end_date: raw.end_date || '',
         description: raw.description || '',
         sort_order: parseInt(raw.sort_order, 10) || 0,
-      })
+      }),
+      { entityLabel: 'Opleiding' }
     );
 
     await Promise.all([refreshProjects(), refreshSkills(), refreshExperiences(), refreshEducations()]);

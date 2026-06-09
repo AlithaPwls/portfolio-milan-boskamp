@@ -11,12 +11,25 @@
 </head>
 <body class="admin-dashboard">
   <div id="dashboard-app" class="dashboard-app">
-    <aside class="sidebar">
+    <aside class="sidebar" id="admin-sidebar">
       <div class="sidebar-header">
-        <h1>Beheer</h1>
-        <a href="/" target="_blank" rel="noopener">Site bekijken ↗</a>
+        <div class="sidebar-header-row">
+          <h1>Beheer</h1>
+          <button
+            type="button"
+            class="sidebar-toggle"
+            id="sidebar-toggle"
+            aria-expanded="true"
+            aria-controls="sidebar-nav"
+            title="Menu inklappen"
+          >
+            <span class="sidebar-toggle-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Menu in-/uitklappen</span>
+          </button>
+        </div>
+        <a href="/" target="_blank" rel="noopener" class="sidebar-site-link">Site bekijken ↗</a>
       </div>
-      <nav class="sidebar-nav" aria-label="Admin secties">
+      <nav class="sidebar-nav" id="sidebar-nav" aria-label="Admin secties">
         <button type="button" class="nav-item is-active" data-panel="general">Algemeen</button>
         <button type="button" class="nav-item" data-panel="profile">Profielfoto</button>
         <button type="button" class="nav-item" data-panel="theme">Thema</button>
@@ -102,8 +115,24 @@
           <input type="hidden" name="id" />
           <label>Titel <input type="text" name="title" required /></label>
           <label>Beschrijving <textarea name="description" rows="3"></textarea></label>
-          <label>Afbeelding URL <input type="url" name="image_url" placeholder="Of upload hieronder" /></label>
-          <label>Afbeelding uploaden <input type="file" name="image_file" accept="image/*" /></label>
+          <fieldset class="form-fieldset">
+            <legend>Hoofdafbeelding</legend>
+            <label>URL <input type="url" name="image_url" placeholder="Of upload hieronder" /></label>
+            <label>Uploaden <input type="file" name="image_file" accept="image/jpeg,image/png,image/webp,image/gif" /></label>
+            <img id="projects-preview-main" class="preview-image preview-image-sm" alt="" hidden />
+          </fieldset>
+          <fieldset class="form-fieldset">
+            <legend>Extra afbeelding (image 2)</legend>
+            <label>URL <input type="url" name="image2_url" placeholder="Of upload hieronder" /></label>
+            <label>Uploaden <input type="file" name="image2_file" accept="image/jpeg,image/png,image/webp,image/gif" /></label>
+            <img id="projects-preview-image2" class="preview-image preview-image-sm" alt="" hidden />
+          </fieldset>
+          <fieldset class="form-fieldset">
+            <legend>Thumbnail (zichtbaar op projectkaart)</legend>
+            <label>URL <input type="url" name="thumbnail_image_url" placeholder="Of upload hieronder" /></label>
+            <label>Uploaden <input type="file" name="thumbnail_file" accept="image/jpeg,image/png,image/webp,image/gif" /></label>
+            <img id="projects-preview-thumbnail" class="preview-image preview-image-sm" alt="" hidden />
+          </fieldset>
           <label>Link (PDF, Drive, etc.) <input type="url" name="live_url" placeholder="Optioneel" /></label>
           <label>Sorteervolgorde <input type="number" name="sort_order" value="0" />
             <span class="hint">Lager = eerder in de lijst</span>
