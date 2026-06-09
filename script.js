@@ -50,48 +50,8 @@
     $('#about-text').textContent = settings?.about_text || 'Nog geen tekst toegevoegd.';
   }
 
-  const PROJECT_SLIDE_MS = 10000;
-
-  function buildProjectMedia(project) {
-    const thumbnail = project.thumbnail_image_url || project.image_url || '';
-    const image2 = project.image2_url || '';
-    const alt = project.title ? escapeHtml(project.title) : 'Projectafbeelding';
-
-    if (thumbnail && image2) {
-      return `
-        <div class="card-media" data-slideshow data-interval="${PROJECT_SLIDE_MS}">
-          <img class="card-image card-image-slide is-active" src="${escapeHtml(thumbnail)}" alt="${alt}" loading="lazy" />
-          <img class="card-image card-image-slide" src="${escapeHtml(image2)}" alt="${alt}" loading="lazy" />
-        </div>
-      `;
-    }
-
-    const single = thumbnail || image2;
-    if (!single) return '';
-
-    return `
-      <div class="card-media">
-        <img class="card-image" src="${escapeHtml(single)}" alt="${alt}" loading="lazy" />
-      </div>
-    `;
-  }
-
-  function initProjectSlideshows(root) {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-    root.querySelectorAll('[data-slideshow]').forEach((media) => {
-      const slides = [...media.querySelectorAll('.card-image-slide')];
-      if (slides.length < 2) return;
-
-      const interval = parseInt(media.dataset.interval, 10) || PROJECT_SLIDE_MS;
-      let index = 0;
-
-      setInterval(() => {
-        slides[index].classList.remove('is-active');
-        index = (index + 1) % slides.length;
-        slides[index].classList.add('is-active');
-      }, interval);
-    });
+  function projectDetailUrl(id) {
+    return 'project/?id=' + encodeURIComponent(id);
   }
 
   function renderProjects(projects) {
@@ -108,27 +68,25 @@
     const sorted = [...projects].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
 
     sorted.forEach((p) => {
-      const card = document.createElement('article');
-      card.className = 'card';
+      const card = document.createElement('a');
+      card.className = 'card card-interactive';
+      card.href = projectDetailUrl(p.id);
       card.setAttribute('role', 'listitem');
-      const mediaHtml = buildProjectMedia(p);
+      const mediaHtml = window.PortfolioMedia.buildProjectMedia(p);
       const badge = p.is_featured ? '<span class="card-badge">Uitgelicht</span>' : '';
-      const link = p.live_url
-        ? `<a class="card-link" href="${escapeHtml(p.live_url)}" target="_blank" rel="noopener noreferrer">Bekijk project →</a>`
-        : '';
       card.innerHTML = `
         ${mediaHtml}
         <div class="card-body">
           ${badge}
           <h3>${escapeHtml(p.title)}</h3>
           <p>${escapeHtml(p.description)}</p>
-          ${link}
+          <span class="card-cta">Bekijk project →</span>
         </div>
       `;
       grid.appendChild(card);
     });
 
-    initProjectSlideshows(grid);
+    window.PortfolioMedia.initProjectSlideshows(grid);
   }
 
   function renderSkills(skills) {

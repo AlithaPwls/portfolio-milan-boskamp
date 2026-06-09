@@ -3,6 +3,8 @@
   "outputDirectory": ".",
   "rewrites": [
     { "source": "/admin", "destination": "/admin/index.html" },
-    { "source": "/admin/dashboard", "destination": "/admin/dashboard.html" }
+    { "source": "/admin/dashboard", "destination": "/admin/dashboard.html" },
+    { "source": "/project", "destination": "/project/index.html" },
+    { "source": "/project/:id", "destination": "/project/index.html?id=:id" }
   ]
 }

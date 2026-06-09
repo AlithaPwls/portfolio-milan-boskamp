@@ -114,7 +114,12 @@
         <form id="form-projects" class="admin-form">
           <input type="hidden" name="id" />
           <label>Titel <input type="text" name="title" required /></label>
-          <label>Beschrijving <textarea name="description" rows="3"></textarea></label>
+          <label>Korte beschrijving (op projectkaart)
+            <textarea name="description" rows="3" placeholder="Korte tekst op de overzichtspagina"></textarea>
+          </label>
+          <label>Uitgebreide beschrijving (detailpagina)
+            <textarea name="long_description" rows="8" placeholder="Volledige toelichting op de projectpagina"></textarea>
+          </label>
           <fieldset class="form-fieldset">
             <legend>Hoofdafbeelding</legend>
             <label>URL <input type="url" name="image_url" placeholder="Of upload hieronder" /></label>

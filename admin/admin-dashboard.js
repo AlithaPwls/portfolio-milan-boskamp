@@ -394,6 +394,7 @@
       (raw) => ({
         title: raw.title,
         description: raw.description || '',
+        long_description: raw.long_description || '',
         image_url: raw.image_url || '',
         image2_url: raw.image2_url || '',
         thumbnail_image_url: raw.thumbnail_image_url || '',

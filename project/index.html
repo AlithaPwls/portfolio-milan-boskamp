@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Projectdetail — portfolio Milan Boskamp" />
+  <title>Project — Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Naar inhoud</a>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="../index.html" class="logo" id="site-logo">Portfolio</a>
+      <nav class="nav" aria-label="Hoofdnavigatie">
+        <a href="../index.html#about">Over mij</a>
+        <a href="../index.html#projects">Projecten</a>
+        <a href="../index.html#skills">Skills</a>
+        <a href="../index.html#experience">Ervaring</a>
+        <a href="../index.html#education">Opleiding</a>
+        <a href="../index.html#contact">Contact</a>
+      </nav>
+      <button type="button" class="nav-toggle" id="nav-toggle" aria-label="Menu openen" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main" class="section">
+    <div class="container project-detail">
+      <a href="../index.html#projects" class="back-link">← Terug naar projecten</a>
+
+      <div id="project-loading" class="project-state">Project laden…</div>
+      <div id="project-error" class="project-state project-state-error" hidden>
+        <p>Dit project kon niet worden gevonden.</p>
+        <a href="../index.html#projects" class="btn btn-primary">Terug naar overzicht</a>
+      </div>
+
+      <article id="project-content" hidden>
+        <div id="project-media"></div>
+        <div class="project-detail-body">
+          <span id="project-badge" class="card-badge" hidden>Uitgelicht</span>
+          <h1 id="project-title" class="project-detail-title"></h1>
+          <div id="project-description" class="project-detail-description"></div>
+        </div>
+      </article>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p id="footer-text">&copy; <span id="footer-year"></span> Portfolio</p>
+    </div>
+  </footer>
+
+  <script src="../lib/config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="../lib/supabase.js"></script>
+  <script src="../lib/project-media.js"></script>
+  <script src="project.js"></script>
+</body>
+</html>
