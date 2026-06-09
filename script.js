@@ -33,6 +33,18 @@
       '&copy; <span id="footer-year"></span> ' + escapeHtml(name);
     $('#footer-year').textContent = new Date().getFullYear();
 
+    const heroBg = $('#hero-bg');
+    const heroBgImage = $('#hero-bg-image');
+    if (settings?.hero_image) {
+      heroBgImage.src = settings.hero_image;
+      heroBg.hidden = false;
+      $('#hero').classList.add('has-hero-bg');
+    } else {
+      heroBgImage.removeAttribute('src');
+      heroBg.hidden = true;
+      $('#hero').classList.remove('has-hero-bg');
+    }
+
     const img = $('#hero-profile');
     const placeholder = $('#hero-profile-placeholder');
     if (settings?.profile_image_url) {

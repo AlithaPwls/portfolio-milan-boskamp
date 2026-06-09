@@ -47,7 +47,7 @@
   function fillForm(form, data) {
     $$('input, textarea, select', form).forEach((field) => {
       const name = field.name;
-      if (!name || name === 'file' || name === 'image_file' || name === 'image2_file' || name === 'thumbnail_file') return;
+      if (!name || name === 'file' || name === 'image_file' || name === 'image2_file' || name === 'thumbnail_file' || name === 'hero_image_file') return;
       if (field.type === 'checkbox') {
         field.checked = !!data[name];
       } else if (field.type === 'color') {
@@ -63,7 +63,7 @@
     const obj = {};
     for (const [k, v] of fd.entries()) {
       if (k === 'id' && !v) continue;
-      if (k === 'image_file' || k === 'image2_file' || k === 'thumbnail_file' || k === 'file') continue;
+      if (k === 'image_file' || k === 'image2_file' || k === 'thumbnail_file' || k === 'hero_image_file' || k === 'file') continue;
       obj[k] = v;
     }
     const cb = form.querySelector('[name="is_featured"]');
@@ -149,6 +149,14 @@
       preview.hidden = false;
     } else {
       preview.hidden = true;
+    }
+
+    const heroPreview = $('#hero-bg-preview');
+    if (settings?.hero_image) {
+      heroPreview.src = settings.hero_image;
+      heroPreview.hidden = false;
+    } else {
+      heroPreview.hidden = true;
     }
   }
 
@@ -293,11 +301,33 @@
   }
 
   function initGeneralForm() {
-    initSettingsForm(
-      '#form-general',
-      'Algemene teksten opslaan…',
-      'Algemene teksten opgeslagen — zichtbaar op de homepage.'
-    );
+    const form = $('#form-general');
+    const submitBtn = $('button[type="submit"]', form);
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = formToObject(e.target);
+      try {
+        setButtonLoading(submitBtn, true, null, 'Opslaan…');
+        showStatus('Algemene teksten opslaan…', 'loading');
+        const file = $('input[name="hero_image_file"]', form).files[0];
+        if (file) {
+          data.hero_image = await window.PortfolioDB.uploadImage(file, 'hero');
+        }
+        settings = await window.PortfolioDB.updateSiteSettings(data);
+        const heroPreview = $('#hero-bg-preview');
+        if (settings.hero_image) {
+          heroPreview.src = settings.hero_image;
+          heroPreview.hidden = false;
+        }
+        const fileInput = $('input[name="hero_image_file"]', form);
+        if (fileInput) fileInput.value = '';
+        showStatus('Algemene teksten opgeslagen — zichtbaar op de homepage.');
+      } catch (err) {
+        showStatus(err.message, 'error');
+      } finally {
+        setButtonLoading(submitBtn, false);
+      }
+    });
   }
 
   function initThemeForm() {

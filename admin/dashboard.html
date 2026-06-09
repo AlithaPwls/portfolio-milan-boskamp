@@ -58,6 +58,16 @@
           <label>Hero ondertitel
             <input type="text" name="hero_subtitle" />
           </label>
+          <fieldset class="form-fieldset">
+            <legend>Hero achtergrond</legend>
+            <label>URL
+              <input type="url" name="hero_image" placeholder="Of upload hieronder" />
+            </label>
+            <label>Uploaden
+              <input type="file" name="hero_image_file" accept="image/jpeg,image/png,image/webp,image/gif" />
+            </label>
+            <img id="hero-bg-preview" class="preview-image preview-image-sm" alt="Huidige hero achtergrond" hidden />
+          </fieldset>
           <label>Over mij
             <textarea name="about_text" rows="6"></textarea>
           </label>
