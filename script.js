@@ -66,39 +66,61 @@
     return 'project/?id=' + encodeURIComponent(id);
   }
 
+  const CAROUSEL_SECONDS_PER_CARD = 14;
+
+  function createProjectCard(project) {
+    const card = document.createElement('a');
+    card.className = 'card card-interactive';
+    card.href = projectDetailUrl(project.id);
+    card.setAttribute('role', 'listitem');
+    const mediaHtml = window.PortfolioMedia.buildProjectMedia(project);
+    const badge = project.is_featured ? '<span class="card-badge">Uitgelicht</span>' : '';
+    card.innerHTML = `
+      ${mediaHtml}
+      <div class="card-body">
+        ${badge}
+        <h3>${escapeHtml(project.title)}</h3>
+        <p>${escapeHtml(project.description)}</p>
+        <span class="card-cta">Bekijk project →</span>
+      </div>
+    `;
+    return card;
+  }
+
   function renderProjects(projects) {
-    const grid = $('#projects-grid');
+    const carousel = $('#projects-carousel');
+    const track = $('#projects-carousel-track');
     const empty = $('#projects-empty');
-    grid.innerHTML = '';
+    track.innerHTML = '';
+    track.classList.remove('is-looping');
+    track.style.removeProperty('--carousel-duration');
 
     if (!projects.length) {
+      carousel.hidden = true;
       empty.hidden = false;
       return;
     }
+
     empty.hidden = true;
+    carousel.hidden = false;
 
     const sorted = [...projects].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    sorted.forEach((p) => {
-      const card = document.createElement('a');
-      card.className = 'card card-interactive';
-      card.href = projectDetailUrl(p.id);
-      card.setAttribute('role', 'listitem');
-      const mediaHtml = window.PortfolioMedia.buildProjectMedia(p);
-      const badge = p.is_featured ? '<span class="card-badge">Uitgelicht</span>' : '';
-      card.innerHTML = `
-        ${mediaHtml}
-        <div class="card-body">
-          ${badge}
-          <h3>${escapeHtml(p.title)}</h3>
-          <p>${escapeHtml(p.description)}</p>
-          <span class="card-cta">Bekijk project →</span>
-        </div>
-      `;
-      grid.appendChild(card);
-    });
+    sorted.forEach((p) => track.appendChild(createProjectCard(p)));
 
-    window.PortfolioMedia.initProjectSlideshows(grid);
+    if (sorted.length > 1 && !reduceMotion) {
+      sorted.forEach((p) => {
+        const clone = createProjectCard(p);
+        clone.setAttribute('aria-hidden', 'true');
+        clone.tabIndex = -1;
+        track.appendChild(clone);
+      });
+      track.classList.add('is-looping');
+      track.style.setProperty('--carousel-duration', sorted.length * CAROUSEL_SECONDS_PER_CARD + 's');
+    }
+
+    window.PortfolioMedia.initProjectSlideshows(track);
   }
 
   function renderSkills(skills) {

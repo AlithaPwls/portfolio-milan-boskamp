@@ -310,11 +310,57 @@ a {
   white-space: pre-wrap;
 }
 
-/* Cards grid */
-.cards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+/* Projects carousel */
+.projects-carousel {
+  overflow: hidden;
+  width: 100%;
+  margin-top: 0.5rem;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+}
+
+.projects-carousel-track {
+  display: flex;
   gap: 1.5rem;
+  width: max-content;
+  padding: 0.25rem 1.5rem 1rem;
+}
+
+.projects-carousel-track.is-looping {
+  animation: projects-carousel-scroll var(--carousel-duration, 70s) linear infinite;
+}
+
+.projects-carousel-track.is-looping:hover {
+  animation-play-state: paused;
+}
+
+@keyframes projects-carousel-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.projects-carousel .card {
+  width: min(320px, 82vw);
+  flex-shrink: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .projects-carousel {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+
+  .projects-carousel-track {
+    flex-wrap: wrap;
+    justify-content: center;
+    width: auto;
+    max-width: var(--container);
+    margin-inline: auto;
+  }
 }
 
 .card {
