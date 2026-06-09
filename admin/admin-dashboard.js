@@ -200,6 +200,7 @@
     const storageFolder = options.storageFolder || table;
     const onEditItem = options.onEditItem;
     const onResetForm = options.onResetForm;
+    const orderBy = options.orderBy || { column: 'sort_order', ascending: true };
 
     const newItemTitle = titleEl.textContent;
     const submitBtn = $('button[type="submit"]', form);
@@ -214,7 +215,7 @@
     }
 
     async function refreshList() {
-      const items = await window.PortfolioDB.fetchTable(table);
+      const items = await window.PortfolioDB.fetchTable(table, orderBy);
       renderItemList(listId, items, labelFn, (item) => {
         fillForm(form, item);
         $('input[name="id"]', form).value = item.id;
@@ -390,6 +391,13 @@
     setImagePreview('#projects-preview-thumbnail', item?.thumbnail_image_url, 'Thumbnail');
   }
 
+  function formatActivityDateAdmin(dateStr) {
+    if (!dateStr) return '';
+    const d = new Date(dateStr + 'T12:00:00');
+    if (Number.isNaN(d.getTime())) return dateStr;
+    return d.toLocaleDateString('nl-NL');
+  }
+
   function initLogout() {
     $('#logout-btn').addEventListener('click', async () => {
       await window.PortfolioDB.signOut();
@@ -502,7 +510,36 @@
       { entityLabel: 'Opleiding' }
     );
 
-    await Promise.all([refreshProjects(), refreshSkills(), refreshExperiences(), refreshEducations()]);
+    const refreshActivities = setupCrud(
+      'activities',
+      '#list-activities',
+      '#form-activities',
+      '#activities-form-title',
+      '#activities-cancel',
+      '#activities-delete',
+      (a) => ({
+        title: a.title,
+        sub: a.date ? formatActivityDateAdmin(a.date) : 'Geen datum',
+      }),
+      (raw) => ({
+        title: raw.title,
+        description: raw.description || '',
+        date: raw.date || null,
+        sort_order: parseInt(raw.sort_order, 10) || 0,
+      }),
+      {
+        entityLabel: 'Activiteit',
+        orderBy: { column: 'date', ascending: false },
+      }
+    );
+
+    await Promise.all([
+      refreshProjects(),
+      refreshSkills(),
+      refreshExperiences(),
+      refreshEducations(),
+      refreshActivities(),
+    ]);
   }
 
   init();

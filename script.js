@@ -155,6 +155,44 @@
       });
   }
 
+  function formatActivityDate(dateStr) {
+    if (!dateStr) return '';
+    const d = new Date(dateStr + 'T12:00:00');
+    if (Number.isNaN(d.getTime())) return dateStr;
+    return d.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
+  }
+
+  function renderActivities(activities) {
+    const container = $('#activities-list');
+    const empty = $('#activities-empty');
+    container.innerHTML = '';
+
+    if (!activities.length) {
+      empty.hidden = false;
+      return;
+    }
+    empty.hidden = true;
+
+    const sorted = [...activities].sort((a, b) => {
+      const dateA = a.date || '';
+      const dateB = b.date || '';
+      if (dateA !== dateB) return dateB.localeCompare(dateA);
+      return (a.sort_order ?? 0) - (b.sort_order ?? 0);
+    });
+
+    sorted.forEach((item) => {
+      const el = document.createElement('article');
+      el.className = 'timeline-item activity-item';
+      const dateLabel = formatActivityDate(item.date);
+      el.innerHTML = `
+        <h3>${escapeHtml(item.title)}</h3>
+        ${dateLabel ? `<p class="timeline-meta activity-date">${escapeHtml(dateLabel)}</p>` : ''}
+        <p>${escapeHtml(item.description)}</p>
+      `;
+      container.appendChild(el);
+    });
+  }
+
   function renderTimeline(list, containerId, emptyId) {
     const container = $(containerId);
     const empty = $(emptyId);
@@ -224,7 +262,7 @@
 
     try {
       const data = await window.PortfolioDB.fetchPublicContent();
-      const { settings, projects, skills, experiences, educations } = data;
+      const { settings, projects, skills, experiences, educations, activities } = data;
 
       applyTheme(settings);
       renderHero(settings);
@@ -233,6 +271,7 @@
       renderSkills(skills);
       renderTimeline(experiences, '#experience-list', '#experience-empty');
       renderTimeline(educations, '#education-list', '#education-empty');
+      renderActivities(activities);
       renderContact(settings);
     } catch (err) {
       console.error(err);

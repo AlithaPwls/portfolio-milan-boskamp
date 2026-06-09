@@ -37,6 +37,7 @@
         <button type="button" class="nav-item" data-panel="skills">Skills</button>
         <button type="button" class="nav-item" data-panel="experiences">Ervaring</button>
         <button type="button" class="nav-item" data-panel="educations">Opleiding</button>
+        <button type="button" class="nav-item" data-panel="activities">Activiteiten</button>
         <button type="button" class="nav-item" data-panel="contact">Contact &amp; social</button>
       </nav>
       <button type="button" class="btn btn-outline logout-btn" id="logout-btn">Uitloggen</button>
@@ -225,6 +226,31 @@
             <button type="submit" class="btn btn-primary">Opslaan</button>
             <button type="button" class="btn btn-outline" id="educations-cancel" hidden>Annuleren</button>
             <button type="button" class="btn btn-danger" id="educations-delete" hidden>Verwijderen</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Activiteiten -->
+      <section class="panel" id="panel-activities" data-panel="activities">
+        <h2>Activiteiten</h2>
+        <p class="hint" style="margin-top: -0.75rem; margin-bottom: 1rem;">
+          Opleidingen, studiedagen, seminaries, workshops, presentaties, projectdagen, …
+        </p>
+        <div id="list-activities" class="item-list"></div>
+        <h3 id="activities-form-title">Nieuwe activiteit</h3>
+        <form id="form-activities" class="admin-form">
+          <input type="hidden" name="id" />
+          <label>Titel <input type="text" name="title" required /></label>
+          <label>Beschrijving <textarea name="description" rows="4"></textarea></label>
+          <label>Datum <input type="date" name="date" /></label>
+          <label>Sorteervolgorde
+            <input type="number" name="sort_order" value="0" />
+            <span class="hint">Bij dezelfde datum: lager = eerder in de lijst</span>
+          </label>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Opslaan</button>
+            <button type="button" class="btn btn-outline" id="activities-cancel" hidden>Annuleren</button>
+            <button type="button" class="btn btn-danger" id="activities-delete" hidden>Verwijderen</button>
           </div>
         </form>
       </section>
